@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:lifegram/screens/auth/otp.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class OTPPage extends StatefulWidget {
+
+  final String phone;
+  
+  OTPPage(this.phone);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _OTPPageState createState() => _OTPPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _OTPPageState extends State<OTPPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final TextEditingController controller = TextEditingController();
@@ -34,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text("Welcome",
                       style: TextStyle(
                           color: Colors.black54, fontWeight: FontWeight.w900))),
-              const Text("Enter your mobile number here",
+              const Text("Enter your OTP here",
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
@@ -78,19 +80,6 @@ class _LoginPageState extends State<LoginPage> {
                       signed: true, decimal: true),
                   onSaved: (PhoneNumber number) {
                     print('On Saved: $number');
-
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => OTPPage(number.toString())));
-
-                    // Navigator.push(
-                    //   context,
-                    //   PageRouteBuilder(
-                    //     pageBuilder: (context, animation1, animation2) =>
-                    //         OTPPage(number.toString()),
-                    //     transitionDuration: Duration.zero,
-                    //     reverseTransitionDuration: Duration.zero,
-                    //   ),
-                    // );
                   },
                 ),
               ),
