@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:lifegram/screens/home.dart';
+import 'package:pinput/pinput.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class OTPPage extends StatefulWidget {
-
   final String phone;
-  
+
   OTPPage(this.phone);
 
   @override
@@ -14,9 +15,17 @@ class OTPPage extends StatefulWidget {
 class _OTPPageState extends State<OTPPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  final TextEditingController controller = TextEditingController();
-  String initialCountry = 'IN';
-  PhoneNumber number = PhoneNumber(isoCode: 'IN');
+  late String _verificationCode;
+  final TextEditingController _pinPutController = TextEditingController();
+  final FocusNode _pinPutFocusNode = FocusNode();
+
+  final BoxDecoration pinPutDecoration = BoxDecoration(
+    color: const Color.fromRGBO(43, 46, 66, 1),
+    borderRadius: BorderRadius.circular(10.0),
+    border: Border.all(
+      color: const Color.fromRGBO(126, 203, 224, 1),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -31,17 +40,13 @@ class _OTPPageState extends State<OTPPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Padding(
-                  padding: EdgeInsets.only(bottom: 15),
-                  child: Text("Welcome",
-                      style: TextStyle(
-                          color: Colors.black54, fontWeight: FontWeight.w900))),
-              const Text("Enter your OTP here",
-                  style: TextStyle(
+              Text('Enter your OTP for ${widget.phone}',
+                  style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
                       color: Colors.black)),
               Container(
+                width: double.infinity,
                 margin: const EdgeInsets.symmetric(vertical: 50, horizontal: 0),
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
@@ -52,34 +57,28 @@ class _OTPPageState extends State<OTPPage> {
                     blurRadius: 1.0,
                   )
                 ]),
-                child: InternationalPhoneNumberInput(
-                  onInputChanged: (PhoneNumber number) {
-                    print("InputChanged");
-                    print(number);
-                  },
-                  selectorConfig: const SelectorConfig(
-                    selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-                    setSelectorButtonAsPrefixIcon: true,
-                    leadingPadding: 5,
-                    useEmoji: true,
-                  ),
-                  ignoreBlank: false,
-                  maxLength: 10,
-                  autoValidateMode: AutovalidateMode.disabled,
-                  selectorTextStyle: const TextStyle(color: Colors.black),
-                  initialValue: number,
-                  textFieldController: controller,
-                  formatInput: false,
-                  spaceBetweenSelectorAndTextField: 0,
-                  inputBorder: InputBorder.none,
-                  inputDecoration: const InputDecoration(
-                      hintText: 'Phone Number',
-                      border: InputBorder.none,
-                      isDense: false),
-                  keyboardType: const TextInputType.numberWithOptions(
-                      signed: true, decimal: true),
-                  onSaved: (PhoneNumber number) {
-                    print('On Saved: $number');
+                child: Pinput(
+                  length: 6,
+                  onCompleted: (pin) async {
+                    try {
+                      await FirebaseAuth.instance
+                          .signInWithCredential(PhoneAuthProvider.credential(
+                              verificationId: _verificationCode,
+                              smsCode: pin))
+                          .then((value) async {
+                        if (value.user != null) {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (context) => Home()),
+                              (route) => false);
+                        }
+                      });
+                    } catch (e) {
+                      FocusScope.of(context).unfocus();
+                      print(e);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('invalid OTP')));
+                    }
                   },
                 ),
               ),
@@ -97,7 +96,7 @@ class _OTPPageState extends State<OTPPage> {
                   onPressed: () {
                     formKey.currentState?.save();
                   },
-                  child: const Text('Get OTP'),
+                  child: const Text('Sign In'),
                 ),
               )
             ],
@@ -105,5 +104,47 @@ class _OTPPageState extends State<OTPPage> {
         ),
       ),
     );
+  }
+
+  _verifyPhone() async {
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: widget.phone,
+          verificationCompleted: (PhoneAuthCredential credential) async {
+            await FirebaseAuth.instance
+                .signInWithCredential(credential)
+                .then((value) async {
+              if (value.user != null) {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => Home()),
+                    (route) => false);
+              }
+            });
+          },
+          verificationFailed: (FirebaseAuthException e) {
+            print(e.message);
+          },
+          codeSent: (String verficationID, int? resendToken) {
+            setState(() {
+              _verificationCode = verficationID;
+            });
+          },
+          codeAutoRetrievalTimeout: (String verificationID) {
+            setState(() {
+              _verificationCode = verificationID;
+            });
+          },
+          timeout: Duration(seconds: 120));
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _verifyPhone();
   }
 }

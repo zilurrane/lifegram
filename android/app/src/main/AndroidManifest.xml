@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lifegram">
    <application
-        android:label="lifegram"
+        android:label="LifeGram"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

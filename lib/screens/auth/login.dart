@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lifegram/screens/auth/otp.dart';
 
 class LoginPage extends StatefulWidget {
