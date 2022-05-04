@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifegram/widgets/mobile_number_input.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -10,6 +10,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  final TextEditingController controller = TextEditingController();
+  String initialCountry = 'IN';
+  PhoneNumber number = PhoneNumber(isoCode: 'IN');
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +49,33 @@ class _LoginPageState extends State<LoginPage> {
                     blurRadius: 1.0,
                   )
                 ]),
-                child: const MobileNumberInput(),
+                child: InternationalPhoneNumberInput(
+                  onInputChanged: (PhoneNumber number) {
+                    print("InputChanged");
+                    print(number);
+                  },
+                  selectorConfig: const SelectorConfig(
+                    selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                    setSelectorButtonAsPrefixIcon: true,
+                    leadingPadding: 5,
+                    useEmoji: true,
+                  ),
+                  ignoreBlank: false,
+                  maxLength: 10,
+                  autoValidateMode: AutovalidateMode.disabled,
+                  selectorTextStyle: const TextStyle(color: Colors.black),
+                  initialValue: number,
+                  textFieldController: controller,
+                  formatInput: false,
+                  spaceBetweenSelectorAndTextField: 0,
+                  inputBorder: InputBorder.none,
+                  inputDecoration: const InputDecoration(
+                      hintText: 'Phone Number',
+                      border: InputBorder.none,
+                      isDense: false),
+                  keyboardType: const TextInputType.numberWithOptions(
+                      signed: true, decimal: true),
+                ),
               ),
               Container(
                 alignment: Alignment.centerRight,
@@ -59,6 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                       textStyle:
                           const TextStyle(fontSize: 24, color: Colors.white)),
                   onPressed: () {
+                    print(controller.text);
                     debugPrint('Received click');
                   },
                   child: const Text('Get OTP'),
