@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:lifegram/screens/home.dart';
+import 'package:lifegram/screens/app/home_screen.dart';
 import 'package:pinput/pinput.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class OTPPage extends StatefulWidget {
+class OTPScreen extends StatefulWidget {
   final String phone;
 
-  OTPPage(this.phone);
+  const OTPScreen(this.phone, {Key? key}) : super(key: key);
 
   @override
-  _OTPPageState createState() => _OTPPageState();
+  _OTPScreenState createState() => _OTPScreenState();
 }
 
-class _OTPPageState extends State<OTPPage> {
+class _OTPScreenState extends State<OTPScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   late String _verificationCode;
@@ -63,13 +63,13 @@ class _OTPPageState extends State<OTPPage> {
                     try {
                       await FirebaseAuth.instance
                           .signInWithCredential(PhoneAuthProvider.credential(
-                              verificationId: _verificationCode,
-                              smsCode: pin))
+                              verificationId: _verificationCode, smsCode: pin))
                           .then((value) async {
                         if (value.user != null) {
                           Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (context) => Home()),
+                              MaterialPageRoute(
+                                  builder: (context) => const HomeScreen()),
                               (route) => false);
                         }
                       });
@@ -117,7 +117,7 @@ class _OTPPageState extends State<OTPPage> {
               if (value.user != null) {
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => Home()),
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
                     (route) => false);
               }
             });
@@ -135,7 +135,7 @@ class _OTPPageState extends State<OTPPage> {
               _verificationCode = verificationID;
             });
           },
-          timeout: Duration(seconds: 120));
+          timeout: const Duration(seconds: 120));
     } catch (error) {
       print(error);
     }
@@ -143,7 +143,6 @@ class _OTPPageState extends State<OTPPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _verifyPhone();
   }

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lifegram/screens/auth/otp.dart';
+import 'package:lifegram/screens/auth/otp_screen.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final TextEditingController controller = TextEditingController();
@@ -81,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                     print('On Saved: $number');
 
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => OTPPage(number.toString())));
+                        builder: (context) => OTPScreen(number.toString())));
 
                     // Navigator.push(
                     //   context,
