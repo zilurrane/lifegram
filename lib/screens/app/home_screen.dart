@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lifegram/screens/app/stories_screen.dart';
 import 'package:lifegram/widgets/bars/home_app_bar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -80,9 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           body: PageView(
             children: const [
-              Center(
-                child: Text("Home"),
-              ),
+              StoriesScreen(),
               Center(
                 child: Text("Explorer"),
               ),
