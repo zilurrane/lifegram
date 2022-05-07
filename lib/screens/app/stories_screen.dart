@@ -27,26 +27,21 @@ class _StoriesScreenState extends State<StoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      decoration:
-          const BoxDecoration(color: Color.fromARGB(255, 239, 241, 255)),
-      padding: const EdgeInsets.all(15.0),
-      child: FutureBuilder<List<Story>>(
-        future: fetchStories(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text('An error has occurred!'),
-            );
-          } else if (snapshot.hasData) {
-            return StoryList(stories: snapshot.data!);
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
+        body: FutureBuilder<List<Story>>(
+      future: fetchStories(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text('An error has occurred!'),
+          );
+        } else if (snapshot.hasData) {
+          return StoryList(stories: snapshot.data!);
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     ));
   }
 }
@@ -61,7 +56,11 @@ class StoryList extends StatelessWidget {
     return ListView.builder(
       itemCount: stories.length,
       itemBuilder: (context, index) {
-        return StoryItem(story: stories[index]);
+        return Container(
+            decoration:
+                const BoxDecoration(color: Color.fromARGB(255, 239, 241, 255)),
+            padding: const EdgeInsets.all(15.0),
+            child: StoryItem(story: stories[index]));
       },
     );
   }
@@ -74,6 +73,19 @@ class StoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text(story.caption ?? ''));
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white),
+      padding: const EdgeInsets.all(15.0),
+      child: Column(
+        children: [
+          Text(story.author?.name ?? ''),
+          Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(color: Colors.grey),
+              child: Image.network(story.images?[0].url ?? '', height: 200)),
+          Text(story.caption ?? '')
+        ],
+      ),
+    );
   }
 }
