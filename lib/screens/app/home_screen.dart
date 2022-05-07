@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lifegram/widgets/app_bars/home_app_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -18,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
         length: 3,
         child: Scaffold(
             backgroundColor: const Color.fromARGB(255, 239, 241, 255),
+            appBar: const HomeAppBar(),
             bottomNavigationBar: SizedBox(
               height: 60,
               child: BottomNavigationBar(
