@@ -75,15 +75,33 @@ class StoryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(color: Colors.white),
-      padding: const EdgeInsets.all(15.0),
+      padding: const EdgeInsets.all(1.0),
       child: Column(
         children: [
-          Text(story.author?.name ?? ''),
+          SizedBox(
+            height: 30,
+            child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Row(children: [
+                  Text(
+                    story.author?.name ?? '',
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w900),
+                  )
+                ])),
+          ),
           Container(
               width: double.infinity,
               decoration: const BoxDecoration(color: Colors.grey),
               child: Image.network(story.images?[0].url ?? '', height: 200)),
-          Text(story.caption ?? '')
+          Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 15),
+              child: Row(children: [
+                Text(
+                  story.caption ?? '',
+                  style: const TextStyle(fontSize: 12),
+                )
+              ]))
         ],
       ),
     );
