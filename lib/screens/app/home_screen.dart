@@ -11,51 +11,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late String uid;
-  int selectedTabIndex = 0; //New
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 3,
-        child: Scaffold(
-            backgroundColor: const Color.fromARGB(255, 239, 241, 255),
-            appBar: const HomeAppBar(),
-            bottomNavigationBar: SizedBox(
-              height: 60,
-              child: BottomNavigationBar(
-                  elevation: 0,
-                  iconSize: 25,
-                  type: BottomNavigationBarType.fixed, // This is all you need!
-                  selectedIconTheme: const IconThemeData(size: 30),
-                  showSelectedLabels: false,
-                  showUnselectedLabels: false,
-                  items: const <BottomNavigationBarItem>[
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
-                      label: 'Home',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.search),
-                      label: 'Explorer',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.notifications),
-                      label: 'Notifications',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.person),
-                      label: 'Profile',
-                    ),
-                  ],
-                  currentIndex: selectedTabIndex, //New
-                  onTap: onTabSelection),
-            ),
-            body: Center(child: Text(uid))));
-  }
+  int _selectedTabIndex = 0; //New
 
   void onTabSelection(int index) {
     setState(() {
-      selectedTabIndex = index;
+      _selectedTabIndex = index;
     });
   }
 
@@ -63,5 +23,56 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     uid = FirebaseAuth.instance.currentUser?.uid ?? "";
+  }
+
+  static const List<Widget> _widgetOptions = <Widget>[
+    Text('Home'),
+    Text('Explore'),
+    Text('Notifications'),
+    Text('Profile')
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          backgroundColor: const Color.fromARGB(255, 239, 241, 255),
+          appBar: const HomeAppBar(),
+          bottomNavigationBar: SizedBox(
+            height: 60,
+            child: BottomNavigationBar(
+                elevation: 0,
+                iconSize: 25,
+                type: BottomNavigationBarType.fixed, // This is all you need!
+                selectedIconTheme: const IconThemeData(size: 30),
+                showSelectedLabels: false,
+                showUnselectedLabels: false,
+                items: const <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.search),
+                    label: 'Explorer',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.notifications),
+                    label: 'Notifications',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Profile',
+                  ),
+                ],
+                currentIndex: _selectedTabIndex, //New
+                onTap: onTabSelection),
+          ),
+          body: Center(
+            child: _widgetOptions
+                .elementAt(_selectedTabIndex), // TODO: Zilu did not liked it
+          ),
+        ));
   }
 }
