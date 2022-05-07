@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:lifegram/widgets/bars/home_app_bar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,9 +14,18 @@ class _HomeScreenState extends State<HomeScreen> {
   late String uid;
   int _selectedTabIndex = 0; //New
 
+  PageController pageController = PageController();
+
   void onTabSelection(int index) {
+    pageController.jumpToPage(index);
     setState(() {
       _selectedTabIndex = index;
+    });
+  }
+
+  void onPageChanged(int page) {
+    setState(() {
+      _selectedTabIndex = page;
     });
   }
 
@@ -23,14 +33,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     uid = FirebaseAuth.instance.currentUser?.uid ?? "";
+    pageController = PageController();
   }
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home'),
-    Text('Explore'),
-    Text('Notifications'),
-    Text('Profile')
-  ];
+  @override
+  void dispose() {
+    super.dispose();
+    pageController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +79,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 currentIndex: _selectedTabIndex, //New
                 onTap: onTabSelection),
           ),
-          body: Center(
-            child: _widgetOptions
-                .elementAt(_selectedTabIndex), // TODO: Zilu did not liked it
+          body: PageView(
+            children: const [
+              Center(
+                child: Text("Home"),
+              ),
+              Center(
+                child: Text("Explorer"),
+              ),
+              Center(
+                child: Text("Notifications"),
+              ),
+              Center(
+                child: Text("Profile"),
+              ),
+            ],
+            controller: pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: onPageChanged,
           ),
         ));
   }
