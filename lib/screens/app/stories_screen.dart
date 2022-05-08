@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -27,15 +27,15 @@ class _StoriesScreenState extends State<StoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: FutureBuilder<List<Story>>(
-      future: fetchStories(),
+        body: StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection("posts").snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Center(
             child: Text('An error has occurred!'),
           );
         } else if (snapshot.hasData) {
-          return StoryList(stories: snapshot.data!);
+          return StoryList(stories: snapshot.data?.docs);
         } else {
           return const Center(
             child: CircularProgressIndicator(),
@@ -49,18 +49,18 @@ class _StoriesScreenState extends State<StoriesScreen> {
 class StoryList extends StatelessWidget {
   const StoryList({Key? key, required this.stories}) : super(key: key);
 
-  final List<Story> stories;
+  final List<QueryDocumentSnapshot<Object?>>? stories;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: stories.length,
+      itemCount: stories?.length,
       itemBuilder: (context, index) {
         return Container(
             decoration:
                 const BoxDecoration(color: Color.fromARGB(255, 239, 241, 255)),
             padding: const EdgeInsets.all(15.0),
-            child: StoryItem(story: stories[index]));
+            child: StoryItem(story: stories?[index]));
       },
     );
   }
@@ -69,7 +69,7 @@ class StoryList extends StatelessWidget {
 class StoryItem extends StatelessWidget {
   const StoryItem({Key? key, required this.story}) : super(key: key);
 
-  final Story story;
+  final QueryDocumentSnapshot<Object?>? story;
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +84,7 @@ class StoryItem extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: Row(children: [
                   Text(
-                    story.author?.name ?? '',
+                    story?['author']['name'] ?? '',
                     style: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w900),
                   )
@@ -93,12 +93,13 @@ class StoryItem extends StatelessWidget {
           Container(
               width: double.infinity,
               decoration: const BoxDecoration(color: Colors.grey),
-              child: Image.network(story.images?[0].url ?? '', height: 200)),
+              child: Image.network(story?['images']?[0]['url'] ?? '',
+                  height: 200)),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 15),
               child: Row(children: [
                 Text(
-                  story.caption ?? '',
+                  story?['caption'] ?? '',
                   style: const TextStyle(fontSize: 12),
                 )
               ]))
