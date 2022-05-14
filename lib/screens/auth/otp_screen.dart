@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:lifegram/screens/app/home_screen.dart';
 import 'package:pinput/pinput.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 
 class OTPScreen extends StatefulWidget {
   final String phone;
@@ -61,18 +63,30 @@ class _OTPScreenState extends State<OTPScreen> {
                   length: 6,
                   onCompleted: (pin) async {
                     try {
-                      await FirebaseAuth.instance
-                          .signInWithCredential(PhoneAuthProvider.credential(
-                              verificationId: _verificationCode, smsCode: pin))
-                          .then((value) async {
-                        if (value.user != null) {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
-                              (route) => false);
-                        }
-                      });
+                      final response = await http.post(
+                          Uri.parse(
+                              'https://lifegram-auth-service.herokuapp.com/auth/otp/phone/verify'),
+                          headers: <String, String>{
+                            'Content-Type': 'application/json; charset=UTF-8',
+                          },
+                          body: jsonEncode(<String, String>{
+                            'phoneNumber': widget.phone,
+                            'otp': pin
+                          }));
+
+                      print(response.statusCode);
+
+                      if (response.statusCode == 200) {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const HomeScreen()),
+                            (route) => false);
+                      } else {
+                        FocusScope.of(context).unfocus();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('invalid OTP')));
+                      }
                     } catch (e) {
                       FocusScope.of(context).unfocus();
                       print(e);
@@ -108,34 +122,14 @@ class _OTPScreenState extends State<OTPScreen> {
 
   _verifyPhone() async {
     try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-          phoneNumber: widget.phone,
-          verificationCompleted: (PhoneAuthCredential credential) async {
-            await FirebaseAuth.instance
-                .signInWithCredential(credential)
-                .then((value) async {
-              if (value.user != null) {
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false);
-              }
-            });
+      final response = await http.post(
+          Uri.parse(
+              'https://lifegram-auth-service.herokuapp.com/auth/otp/phone/init'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
           },
-          verificationFailed: (FirebaseAuthException e) {
-            print(e.message);
-          },
-          codeSent: (String verficationID, int? resendToken) {
-            setState(() {
-              _verificationCode = verficationID;
-            });
-          },
-          codeAutoRetrievalTimeout: (String verificationID) {
-            setState(() {
-              _verificationCode = verificationID;
-            });
-          },
-          timeout: const Duration(seconds: 120));
+          body: jsonEncode(<String, String>{'phoneNumber': widget.phone}));
+      print(response.statusCode);
     } catch (error) {
       print(error);
     }

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifegram/screens/app/stories_screen.dart';
 import 'package:lifegram/widgets/bars/home_app_bar.dart';
@@ -11,7 +10,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late String uid;
   int _selectedTabIndex = 0; //New
 
   PageController pageController = PageController();
@@ -32,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    uid = FirebaseAuth.instance.currentUser?.uid ?? "";
     pageController = PageController();
   }
 
