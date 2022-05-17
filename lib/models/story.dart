@@ -1,16 +1,16 @@
 class Story {
-  String? caption;
-  List<Images>? images;
+  String? text;
+  List<Medias>? medias;
   Author? author;
 
-  Story({this.caption, this.images, this.author});
+  Story({this.text, this.medias, this.author});
 
   Story.fromJson(Map<String, dynamic> json) {
-    caption = json['caption'];
-    if (json['images'] != null) {
-      images = <Images>[];
-      json['images'].forEach((v) {
-        images!.add(new Images.fromJson(v));
+    text = json['text'];
+    if (json['medias'] != null) {
+      medias = <Medias>[];
+      json['medias'].forEach((v) {
+        medias!.add(new Medias.fromJson(v));
       });
     }
     author =
@@ -19,9 +19,9 @@ class Story {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['caption'] = this.caption;
-    if (this.images != null) {
-      data['images'] = this.images!.map((v) => v.toJson()).toList();
+    data['text'] = this.text;
+    if (this.medias != null) {
+      data['medias'] = this.medias!.map((v) => v.toJson()).toList();
     }
     if (this.author != null) {
       data['author'] = this.author!.toJson();
@@ -30,12 +30,12 @@ class Story {
   }
 }
 
-class Images {
+class Medias {
   String? url;
 
-  Images({this.url});
+  Medias({this.url});
 
-  Images.fromJson(Map<String, dynamic> json) {
+  Medias.fromJson(Map<String, dynamic> json) {
     url = json['url'];
   }
 

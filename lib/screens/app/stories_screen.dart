@@ -1,19 +1,25 @@
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:lifegram/models/story.dart';
+import 'package:http/http.dart' as http;
 
 List<Story> parseStories(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-
   return parsed.map<Story>((json) => Story.fromJson(json)).toList();
 }
 
 Future<List<Story>> fetchStories() async {
-  final String response = await rootBundle.loadString('json/stories.json');
-  return compute(parseStories, response);
+  final response = await http.get(
+      Uri.parse('https://lifegram-auth-service.herokuapp.com/posts'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      });
+  if (response.statusCode == 200) {
+    return compute(parseStories, response.body);
+  } else {
+    throw Exception('Failed to load data');
+  }
 }
 
 class StoriesScreen extends StatefulWidget {
@@ -27,29 +33,28 @@ class _StoriesScreenState extends State<StoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection("posts").snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Center(
-            child: Text('An error has occurred!'),
-          );
-        } else if (snapshot.hasData) {
-          return StoryList(stories: snapshot.data?.docs);
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
-    ));
+        body: FutureBuilder<List<Story>>(
+            future: fetchStories(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Center(
+                  child: Text('An error has occurred!'),
+                );
+              } else if (snapshot.hasData) {
+                return StoryList(stories: snapshot.data!);
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            }));
   }
 }
 
 class StoryList extends StatelessWidget {
   const StoryList({Key? key, required this.stories}) : super(key: key);
 
-  final List<QueryDocumentSnapshot<Object?>>? stories;
+  final List<Story>? stories;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +74,7 @@ class StoryList extends StatelessWidget {
 class StoryItem extends StatelessWidget {
   const StoryItem({Key? key, required this.story}) : super(key: key);
 
-  final QueryDocumentSnapshot<Object?>? story;
+  final Story? story;
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +89,7 @@ class StoryItem extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: Row(children: [
                   Text(
-                    story?['author']['name'] ?? '',
+                    story?.author?.name ?? 'Zilu',
                     style: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w900),
                   )
@@ -93,13 +98,13 @@ class StoryItem extends StatelessWidget {
           Container(
               width: double.infinity,
               decoration: const BoxDecoration(color: Colors.grey),
-              child: Image.network(story?['images']?[0]['url'] ?? '',
+              child: Image.network('https://i.imgur.com/o8NXruv.png',
                   height: 200)),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 15),
               child: Row(children: [
                 Text(
-                  story?['caption'] ?? '',
+                  story?.text ?? '',
                   style: const TextStyle(fontSize: 12),
                 )
               ]))
