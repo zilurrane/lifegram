@@ -1,5 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lifegram/widgets/bars/home_app_bar.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:async/async.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({Key? key}) : super(key: key);
@@ -9,47 +17,87 @@ class AddPostScreen extends StatefulWidget {
 }
 
 class _AddPostScreenState extends State<AddPostScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final ImagePicker _picker = ImagePicker();
+  final TextEditingController _textEditingController = TextEditingController();
+
+  XFile? _selectedImage;
+
+  Future<void> _openImagePicker() async {
+    final XFile? selectedImage =
+        await _picker.pickImage(source: ImageSource.gallery);
+    print(selectedImage?.mimeType);
+    print(selectedImage?.name);
+    print(selectedImage?.path);
+    setState(() {
+      _selectedImage = selectedImage;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: const HomeAppBar(),
-        body: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(15),
-                child: TextFormField(
-                  // The validator receives the text that the user has entered.
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter some text';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(15),
-                child: ElevatedButton(
+        body: Column(
+          children: [
+            Center(
+              child: ElevatedButton(
                   onPressed: () {
-                    // Validate returns true if the form is valid, or false otherwise.
-                    if (_formKey.currentState!.validate()) {
-                      // If the form is valid, display a snackbar. In the real world,
-                      // you'd often call a server or save the information in a database.
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Processing Data')),
-                      );
-                    }
+                    _openImagePicker();
                   },
-                  child: const Text('Submit'),
-                ),
-              ),
-            ],
-          ),
+                  child: const Text("Select Image")),
+            ),
+            _selectedImage?.path != null
+                ? (kIsWeb
+                    ? Image.network(_selectedImage?.path ?? "")
+                    : Image.file(File(_selectedImage?.path ?? "")))
+                : const SizedBox(width: 0, height: 0),
+            TextField(
+              controller: _textEditingController,
+              decoration: const InputDecoration(hintText: 'Enter Caption'),
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  createNewPost();
+                },
+                child: const Text("Submit"))
+          ],
         ));
+  }
+
+  createNewPost() async {
+    try {
+      if (_selectedImage != null) {
+        var strm = _selectedImage?.openRead();
+        var stream = http.ByteStream(DelegatingStream.typed(strm!));
+        var length = await _selectedImage?.length();
+
+        var uri = Uri.parse('http://localhost:7000/posts');
+
+        var request = http.MultipartRequest("POST", uri);
+        var multipartFile = http.MultipartFile('file', stream, length!,
+            filename: _selectedImage?.name);
+
+        request.files.add(multipartFile);
+
+        request.fields['text'] = _textEditingController.text;
+
+        var response = await request.send();
+
+        print(response.statusCode);
+
+        response.stream.transform(utf8.decoder).listen((value) {
+          print(value);
+        });
+      }
+    } catch (error) {
+      print("inside catch");
+      print(error);
+    }
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
   }
 }
