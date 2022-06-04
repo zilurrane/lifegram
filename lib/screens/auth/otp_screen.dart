@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:lifegram/screens/app/home_screen.dart';
+import 'package:lifegram/shared/constants/env_constants.dart';
 import 'package:pinput/pinput.dart';
 import 'package:http/http.dart' as http;
 
@@ -65,7 +66,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     try {
                       final response = await http.post(
                           Uri.parse(
-                              'https://lifegram-auth-service.herokuapp.com/auth/otp/phone/verify'),
+                              '${EnvConstants.apiUrl}/auth/otp/phone/verify'),
                           headers: <String, String>{
                             'Content-Type': 'application/json; charset=UTF-8',
                           },
@@ -123,8 +124,7 @@ class _OTPScreenState extends State<OTPScreen> {
   _verifyPhone() async {
     try {
       final response = await http.post(
-          Uri.parse(
-              'https://lifegram-auth-service.herokuapp.com/auth/otp/phone/init'),
+          Uri.parse('${EnvConstants.apiUrl}/auth/otp/phone/init'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },

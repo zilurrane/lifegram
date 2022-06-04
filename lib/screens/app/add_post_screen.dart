@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lifegram/shared/constants/env_constants.dart';
 import 'package:lifegram/widgets/bars/home_app_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -71,7 +72,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
         var stream = http.ByteStream(DelegatingStream.typed(strm!));
         var length = await _selectedImage?.length();
 
-        var uri = Uri.parse('http://localhost:7000/posts');
+        var uri = Uri.parse('${EnvConstants.apiUrl}/posts');
 
         var request = http.MultipartRequest("POST", uri);
         var multipartFile = http.MultipartFile('file', stream, length!,

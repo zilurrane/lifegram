@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lifegram/models/story.dart';
 import 'package:http/http.dart' as http;
+import 'package:lifegram/shared/constants/env_constants.dart';
 
 List<Story> parseStories(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
@@ -11,7 +12,7 @@ List<Story> parseStories(String responseBody) {
 
 Future<List<Story>> fetchStories() async {
   final response = await http.get(
-      Uri.parse('https://lifegram-auth-service.herokuapp.com/posts'),
+      Uri.parse('${EnvConstants.apiUrl}/posts'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       });
