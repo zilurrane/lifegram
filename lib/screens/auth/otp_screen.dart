@@ -18,10 +18,6 @@ class OTPScreen extends StatefulWidget {
 class _OTPScreenState extends State<OTPScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  late String _verificationCode;
-  final TextEditingController _pinPutController = TextEditingController();
-  final FocusNode _pinPutFocusNode = FocusNode();
-
   final BoxDecoration pinPutDecoration = BoxDecoration(
     color: const Color.fromRGBO(43, 46, 66, 1),
     borderRadius: BorderRadius.circular(10.0),
@@ -74,9 +70,6 @@ class _OTPScreenState extends State<OTPScreen> {
                             'phoneNumber': widget.phone,
                             'otp': pin
                           }));
-
-                      print(response.statusCode);
-
                       if (response.statusCode == 200) {
                         Navigator.pushAndRemoveUntil(
                             context,
@@ -90,7 +83,6 @@ class _OTPScreenState extends State<OTPScreen> {
                       }
                     } catch (e) {
                       FocusScope.of(context).unfocus();
-                      print(e);
                       ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('invalid OTP')));
                     }
