@@ -81,16 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => OTPScreen(number.toString())));
-
-                    // Navigator.push(
-                    //   context,
-                    //   PageRouteBuilder(
-                    //     pageBuilder: (context, animation1, animation2) =>
-                    //         OTPPage(number.toString()),
-                    //     transitionDuration: Duration.zero,
-                    //     reverseTransitionDuration: Duration.zero,
-                    //   ),
-                    // );
                   },
                 ),
               ),
