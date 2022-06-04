@@ -113,23 +113,8 @@ class _OTPScreenState extends State<OTPScreen> {
     );
   }
 
-  _verifyPhone() async {
-    try {
-      final response = await http.post(
-          Uri.parse('${EnvConstants.apiUrl}/auth/otp/phone/init'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(<String, String>{'phoneNumber': widget.phone}));
-      print(response.statusCode);
-    } catch (error) {
-      print(error);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    _verifyPhone();
   }
 }

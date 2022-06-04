@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:lifegram/screens/auth/otp_screen.dart';
+import 'package:lifegram/shared/constants/env_constants.dart';
+import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -78,9 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       signed: true, decimal: true),
                   onSaved: (PhoneNumber number) {
                     print('On Saved: $number');
-
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => OTPScreen(number.toString())));
+                    _verifyPhone(number.toString());
                   },
                 ),
               ),
@@ -106,5 +107,22 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  _verifyPhone(String phoneNumber) async {
+    try {
+      final response = await http.post(
+          Uri.parse('${EnvConstants.apiUrl}/auth/otp/phone/init'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, String>{'phoneNumber': phoneNumber}));
+      if (response.statusCode == 200) {
+        Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => OTPScreen(phoneNumber)));
+      }
+    } catch (error) {
+      print(error);
+    }
   }
 }
