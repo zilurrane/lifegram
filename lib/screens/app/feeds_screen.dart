@@ -1,48 +1,47 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:lifegram/models/story.dart';
+import 'package:lifegram/models/feed.dart';
 import 'package:http/http.dart' as http;
 import 'package:lifegram/shared/constants/env_constants.dart';
 
-List<Story> parseStories(String responseBody) {
+List<Feed> parseFeeds(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed.map<Story>((json) => Story.fromJson(json)).toList();
+  return parsed.map<Feed>((json) => Feed.fromJson(json)).toList();
 }
 
-Future<List<Story>> fetchStories() async {
-  final response = await http.get(
-      Uri.parse('${EnvConstants.apiUrl}/posts'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      });
+Future<List<Feed>> fetchFeeds() async {
+  final response = await http
+      .get(Uri.parse('${EnvConstants.apiUrl}/posts'), headers: <String, String>{
+    'Content-Type': 'application/json; charset=UTF-8',
+  });
   if (response.statusCode == 200) {
-    return compute(parseStories, response.body);
+    return compute(parseFeeds, response.body);
   } else {
     throw Exception('Failed to load data');
   }
 }
 
-class StoriesScreen extends StatefulWidget {
-  const StoriesScreen({Key? key}) : super(key: key);
+class FeedsScreen extends StatefulWidget {
+  const FeedsScreen({Key? key}) : super(key: key);
 
   @override
-  State<StoriesScreen> createState() => _StoriesScreenState();
+  State<FeedsScreen> createState() => _FeedsScreenState();
 }
 
-class _StoriesScreenState extends State<StoriesScreen> {
+class _FeedsScreenState extends State<FeedsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: FutureBuilder<List<Story>>(
-            future: fetchStories(),
+        body: FutureBuilder<List<Feed>>(
+            future: fetchFeeds(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return const Center(
                   child: Text('An error has occurred!'),
                 );
               } else if (snapshot.hasData) {
-                return StoryList(stories: snapshot.data!);
+                return FeedList(feeds: snapshot.data!);
               } else {
                 return const Center(
                   child: CircularProgressIndicator(),
@@ -52,30 +51,30 @@ class _StoriesScreenState extends State<StoriesScreen> {
   }
 }
 
-class StoryList extends StatelessWidget {
-  const StoryList({Key? key, required this.stories}) : super(key: key);
+class FeedList extends StatelessWidget {
+  const FeedList({Key? key, required this.feeds}) : super(key: key);
 
-  final List<Story>? stories;
+  final List<Feed>? feeds;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: stories?.length,
+      itemCount: feeds?.length,
       itemBuilder: (context, index) {
         return Container(
             decoration:
                 const BoxDecoration(color: Color.fromARGB(255, 239, 241, 255)),
             padding: const EdgeInsets.all(15.0),
-            child: StoryItem(story: stories?[index]));
+            child: FeedItem(story: feeds?[index]));
       },
     );
   }
 }
 
-class StoryItem extends StatelessWidget {
-  const StoryItem({Key? key, required this.story}) : super(key: key);
+class FeedItem extends StatelessWidget {
+  const FeedItem({Key? key, required this.story}) : super(key: key);
 
-  final Story? story;
+  final Feed? story;
 
   @override
   Widget build(BuildContext context) {

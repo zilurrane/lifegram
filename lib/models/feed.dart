@@ -1,11 +1,11 @@
-class Story {
+class Feed {
   String? text;
   List<Medias>? medias;
   Author? author;
 
-  Story({this.text, this.medias, this.author});
+  Feed({this.text, this.medias, this.author});
 
-  Story.fromJson(Map<String, dynamic> json) {
+  Feed.fromJson(Map<String, dynamic> json) {
     text = json['text'];
     if (json['medias'] != null) {
       medias = <Medias>[];
