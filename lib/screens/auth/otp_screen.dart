@@ -60,27 +60,32 @@ class _OTPScreenState extends State<OTPScreen> {
                   length: 6,
                   onCompleted: (pin) async {
                     try {
-                      final response = await http.post(
-                          Uri.parse(
-                              '${EnvConstants.apiUrl}/auth/otp/phone/verify'),
-                          headers: <String, String>{
-                            'Content-Type': 'application/json; charset=UTF-8',
-                          },
-                          body: jsonEncode(<String, String>{
-                            'phoneNumber': widget.phone,
-                            'otp': pin
-                          }));
-                      if (response.statusCode == 200) {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const HomeScreen()),
-                            (route) => false);
-                      } else {
-                        FocusScope.of(context).unfocus();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('invalid OTP')));
-                      }
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HomeScreen()),
+                          (route) => false);
+                      // final response = await http.post(
+                      //     Uri.parse(
+                      //         '${EnvConstants.apiUrl}/auth/otp/phone/verify'),
+                      //     headers: <String, String>{
+                      //       'Content-Type': 'application/json; charset=UTF-8',
+                      //     },
+                      //     body: jsonEncode(<String, String>{
+                      //       'phoneNumber': widget.phone,
+                      //       'otp': pin
+                      //     }));
+                      // if (response.statusCode == 200) {
+                      //   Navigator.pushAndRemoveUntil(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //           builder: (context) => const HomeScreen()),
+                      //       (route) => false);
+                      // } else {
+                      //   FocusScope.of(context).unfocus();
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //       const SnackBar(content: Text('invalid OTP')));
+                      // }
                     } catch (e) {
                       FocusScope.of(context).unfocus();
                       ScaffoldMessenger.of(context).showSnackBar(

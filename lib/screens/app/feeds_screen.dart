@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lifegram/models/feed.dart';
-import 'package:http/http.dart' as http;
-import 'package:lifegram/shared/constants/env_constants.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 List<Feed> parseFeeds(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
@@ -11,15 +10,8 @@ List<Feed> parseFeeds(String responseBody) {
 }
 
 Future<List<Feed>> fetchFeeds() async {
-  final response = await http
-      .get(Uri.parse('${EnvConstants.apiUrl}/posts'), headers: <String, String>{
-    'Content-Type': 'application/json; charset=UTF-8',
-  });
-  if (response.statusCode == 200) {
-    return compute(parseFeeds, response.body);
-  } else {
-    throw Exception('Failed to load data');
-  }
+  final String data = await rootBundle.loadString("assets/json/stories.json");
+    return compute(parseFeeds, data);
 }
 
 class FeedsScreen extends StatefulWidget {

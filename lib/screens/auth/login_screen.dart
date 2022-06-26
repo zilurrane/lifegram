@@ -111,16 +111,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   _verifyPhone(String phoneNumber) async {
     try {
-      final response = await http.post(
-          Uri.parse('${EnvConstants.apiUrl}/auth/otp/phone/init'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(<String, String>{'phoneNumber': phoneNumber}));
-      if (response.statusCode == 200) {
-        Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => OTPScreen(phoneNumber)));
-      }
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => OTPScreen(phoneNumber)));
+
+      // final response = await http.post(
+      //     Uri.parse('${EnvConstants.apiUrl}/auth/otp/phone/init'),
+      //     headers: <String, String>{
+      //       'Content-Type': 'application/json; charset=UTF-8',
+      //     },
+      //     body: jsonEncode(<String, String>{'phoneNumber': phoneNumber}));
+      // if (response.statusCode == 200) {
+      //   Navigator.of(context).push(
+      //       MaterialPageRoute(builder: (context) => OTPScreen(phoneNumber)));
+      // }
     } catch (error) {
       print(error);
     }
